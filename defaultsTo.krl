@@ -43,8 +43,7 @@ A first ruleset for the Quickstart
   rule hello_monkey {
     select when echo monkey
     pre {
-      name = (event:attr("name") == NULL) => "Monkey" | event:attr("name")
-      name = name.klog("our name: ")
+      name = event:attr("name").defaultsTo("Monkey").klog("our name: ")
     }
     send_directive("say", {"something":"Hello " + name})
   }
