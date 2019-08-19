@@ -35,21 +35,41 @@ $(document).ready(function(){
 
   /*********************************** FUNCTION DECLARATIONS ******************************************************
   *****************************************************************************************************************/
+  var retrieveCurrentEci = function() {
+    $.ajax({
+      async: false,
+      url: buildQueryURL(config.default_eci, config.eci_store_rid, config.eci_func),
+      dataType: "json"
+    })
+    .done(function(json){
+
+      console.log("Retrieved Current Eci: ", json);
+      let currentEci = json[json.length-1].eci;
+
+      config.default_eci = currentEci;
+      console.log("config.default_eci is now ", config.default_eci);
+
+    })
+    .fail(function(error){
+      console.error("Error retrieving current eci: ", error);
+    });
+  };//end retrieveCurrentEci
+
   var retrieveCurrentTemp = function(){
     $.ajax({
       url: buildQueryURL(config.default_eci, config.temp_store_rid, config.temperature_func),
       dataType: "json",
       success: function(json){
-        //?????????????Implement this function
-
 
         //HINT $("#currentTemp") GRABS the html tag with id "currentTemp", and may be changed with the .html function. See the JQuery docs for more info
         console.log("Retrieved Current Temperature: ", json);
-        let temp = json[json.length-1].temperature;
+        let temp = 0;
+        if (json.length > 0) {
+          temp = json[json.length-1].temperature;
+        }
 
         $('#currentTemp').html(`<p>${temp}</p>`);
 
-        //^^^^^^^^^^^^^?????????^^^^^^^^^^^?????????
       },
       error: function(error){
         console.error("Error retrieving current temperature: ", error);
@@ -62,11 +82,9 @@ $(document).ready(function(){
       url: buildQueryURL(config.default_eci, config.temp_store_rid, config.violation_func),
       dataType: "json",
       success: function(json){
-        //?????????????Implement this function
-
 
         //HINT $("#violationLogs") GRABS the html tag with id "violationLogs", and may be changed with the .html function. See the JQuery docs for more info
-        console.log("Retrived violation logs: ", json);
+        console.log("Retrieved violation logs: ", json);
         let violationTemps = "";
         $.each(json, function(index, obj){
           $.each(obj, function(key, value){
@@ -74,8 +92,6 @@ $(document).ready(function(){
           })
         });
 
-
-        //^^^^^^^^^^^^^?????????^^^^^^^^^^^?????????
       },
       error: function(error){
         console.error("Error retrieving violation logs: ", error);
@@ -92,12 +108,14 @@ $(document).ready(function(){
 
 
   //load initial data
+  retrieveCurrentEci();
   retrieveCurrentTemp();
   setViolationLogs();
 
   //BEGIN BUTTON SETUP
   $('#tempRefresh').click(function(e){
     e.preventDefault();
+    retrieveCurrentEci();
     retrieveCurrentTemp();
   });
 
