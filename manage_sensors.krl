@@ -17,8 +17,8 @@ ruleset manage_sensors {
     }
 
     sensors = function() {
-      temp = ent:sensors.reverse();
-      temp.head()
+      x = ent:sensors;
+      x.defaultsTo([{"sensor_name":"default_sensor_name", "eci":"zm3xzwsvUQMMaxjQRvNj7"}])
     }
 
     showChildren = function() {
