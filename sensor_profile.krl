@@ -16,6 +16,13 @@ ruleset sensor_profile {
                   "events": [ { "domain": "sensor", "type": "profile_updated" } ] }
   }
 
+  rule acceptSensorSubscriptions {
+    select when wrangler inbound_pending_subscription_added
+    always {
+      raise wrangler event "pending_subscription_approval" attributes event:attrs;
+    }
+  }
+
   rule update_profile {
     select when sensor profile_updated
       pre {
