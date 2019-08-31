@@ -58,16 +58,16 @@ ruleset wovyn_base {
 
   rule threshold_notification {
     select when wovyn threshold_violation
-    pre {
-      subscriptionArray = subscription:established("Tx_role", "manager");
-      subcription = subscriptionArray.head();
-      peerChannel = subcription{"Tx"};
-      peerHost = (subcription{"Tx_host"} || meta:host);
-      peerInfo = wrangler:skyQuery(peerChannel, "io.picolabs.wrangler", "myself", null, peerHost).klog("peerInfo is ");
-      peerPicoName = peerInfo{"name"}.klog("pico name is");
-      peerPicoEci = peerInfo{"eci"}.klog("eci is ");
-    }
-    event:send({"eci":peerPicoEci, "domain":"wovyn", "type":"threshold_violation", "attrs":{}})
+      foreach subscription:established("Tx_role", "manager") setting (subscriptionArray)
+      pre {
+        subcription = subscriptionArray.head();
+        peerChannel = subcription{"Tx"};
+        peerHost = (subcription{"Tx_host"} || meta:host);
+        peerInfo = wrangler:skyQuery(peerChannel, "io.picolabs.wrangler", "myself", null, peerHost).klog("peerInfo is ");
+        peerPicoName = peerInfo{"name"}.klog("pico name is");
+        peerPicoEci = peerInfo{"eci"}.klog("eci is ");
+      }
+      event:send({"eci":peerPicoEci, "domain":"wovyn", "type":"threshold_violation", "attrs":{}})
   }
 
 }
